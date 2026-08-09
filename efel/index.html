@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>efel | Kiari</title>
-
+<link rel="icon" type="image/png" href="./bira.png">
 <style>
 :root {
     --bg: #090a0d;
@@ -373,6 +373,47 @@ textarea {
     font-size: 11px;
 }
 
+/* SOUND LEVELS */
+
+.sound-settings {
+    display: grid;
+    gap: 9px;
+    margin-top: 8px;
+}
+
+.sound-row {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) 42px;
+    gap: 10px;
+    align-items: center;
+
+    padding: 9px 10px;
+
+    background: #101216;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+}
+
+.sound-row label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #d3d6dd;
+}
+
+.sound-row input[type="range"] {
+    width: 100%;
+    min-width: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.sound-value {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
 /* IMPORT EXPORT */
 
 .io-actions {
@@ -608,6 +649,10 @@ canvas.spinning {
     border-top: 18px solid transparent;
     border-bottom: 18px solid transparent;
     border-right: 39px solid #f3f4f6;
+
+    filter:
+        drop-shadow(0 3px 3px rgba(0, 0, 0, 0.8))
+        drop-shadow(0 0 5px rgba(0, 0, 0, 0.45));
 
     pointer-events: none;
 
@@ -913,6 +958,11 @@ canvas.spinning {
 
 <body>
 
+<audio id="tickSound" src="./tick.mp3" preload="auto"></audio>
+<audio id="winSound" src="./win.mp3" preload="auto"></audio>
+<audio id="deathSound" src="./death.mp3" preload="auto"></audio>
+<audio id="jackpotSound" src="./jackpot.mp3" preload="auto"></audio>
+
 <header class="topbar">
 
     <div class="logo">
@@ -1192,6 +1242,45 @@ canvas.spinning {
                 >
                     Resmi Kaldır
                 </button>
+
+            </div>
+
+            <h3>
+                Ses Seviyeleri
+            </h3>
+
+
+            <div class="sound-settings">
+
+                <div class="sound-row">
+                    <label for="masterVolume">Genel</label>
+                    <input id="masterVolume" type="range" min="0" max="100" step="1">
+                    <span id="masterVolumeValue" class="sound-value">100%</span>
+                </div>
+
+                <div class="sound-row">
+                    <label for="tickVolume">Tik</label>
+                    <input id="tickVolume" type="range" min="0" max="100" step="1">
+                    <span id="tickVolumeValue" class="sound-value">100%</span>
+                </div>
+
+                <div class="sound-row">
+                    <label for="resultVolume">Sonuç</label>
+                    <input id="resultVolume" type="range" min="0" max="100" step="1">
+                    <span id="resultVolumeValue" class="sound-value">100%</span>
+                </div>
+
+                <div class="sound-row">
+                    <label for="deathVolume">Ölüm</label>
+                    <input id="deathVolume" type="range" min="0" max="100" step="1">
+                    <span id="deathVolumeValue" class="sound-value">100%</span>
+                </div>
+
+                <div class="sound-row">
+                    <label for="jackpotVolume">Jackpot</label>
+                    <input id="jackpotVolume" type="range" min="0" max="100" step="1">
+                    <span id="jackpotVolumeValue" class="sound-value">100%</span>
+                </div>
 
             </div>
 
@@ -1636,6 +1725,60 @@ canvas.spinning {
 
 <script>
 
+const tickSound =
+    document.getElementById("tickSound");
+
+const winSound =
+    document.getElementById("winSound");
+
+const deathSound =
+    document.getElementById("deathSound");
+
+const jackpotSound =
+    document.getElementById("jackpotSound");
+
+let lastTickIndex = -1;
+let lastTickTime = 0;
+
+const MIN_TICK_INTERVAL = 45;
+
+function getHighestMultiplier() {
+
+    const multipliers =
+        getEntries()
+            .map(entry => {
+
+                const text =
+                    entry
+                        .trim()
+                        .toLowerCase();
+
+                // Sadece x ile biten değerleri al
+                if (!text.endsWith("x")) {
+                    return null;
+                }
+
+                const value =
+                    parseMultiplier(entry);
+
+                return (
+                    value !== null &&
+                    Number.isFinite(value)
+                )
+                    ? value
+                    : null;
+            })
+            .filter(value => value !== null);
+
+
+    if (!multipliers.length) {
+        return null;
+    }
+
+
+    return Math.max(...multipliers);
+}
+
 /* STORAGE */
 
 const STORAGE_KEY =
@@ -1692,6 +1835,14 @@ const DEFAULT_STATE = {
     palette: "mono",
 
     centerImageData: null,
+
+    volumes: {
+        master: 100,
+        tick: 100,
+        result: 100,
+        death: 100,
+        jackpot: 100
+    },
 
     normalTotalMinutes: 0,
 
@@ -1916,6 +2067,72 @@ function getNumberValue(id) {
 }
 
 
+function getVolumeValue(id) {
+
+    const value =
+        Number(
+            document.getElementById(id).value
+        );
+
+    return Number.isFinite(value)
+        ? Math.max(0, Math.min(100, value))
+        : 100;
+
+}
+
+
+function syncSoundVolumes() {
+
+    const master =
+        getVolumeValue("masterVolume") / 100;
+
+    const volumeMap = [
+        [tickSound, "tickVolume"],
+        [winSound, "resultVolume"],
+        [deathSound, "deathVolume"],
+        [jackpotSound, "jackpotVolume"]
+    ];
+
+    volumeMap.forEach(
+        ([audio, inputId]) => {
+            audio.volume =
+                master *
+                (getVolumeValue(inputId) / 100);
+        }
+    );
+
+}
+
+
+function updateVolumeLabels() {
+
+    [
+        "master",
+        "tick",
+        "result",
+        "death",
+        "jackpot"
+    ]
+    .forEach(
+        key => {
+            const input =
+                document.getElementById(
+                    `${key}Volume`
+                );
+
+            const label =
+                document.getElementById(
+                    `${key}VolumeValue`
+                );
+
+            label.textContent =
+                `${Math.round(Number(input.value))}%`;
+        }
+    );
+
+}
+
+
 /* TOAST */
 
 let toastTimer = null;
@@ -1980,6 +2197,25 @@ function buildState() {
 
             beets:
                 document.getElementById("beetsEnabled").checked
+
+        },
+
+        volumes: {
+
+            master:
+                getVolumeValue("masterVolume"),
+
+            tick:
+                getVolumeValue("tickVolume"),
+
+            result:
+                getVolumeValue("resultVolume"),
+
+            death:
+                getVolumeValue("deathVolume"),
+
+            jackpot:
+                getVolumeValue("jackpotVolume")
 
         },
 
@@ -2110,6 +2346,37 @@ function normalizeImportedState(data) {
                     state.enabled[key] =
                         data.enabled[key];
 
+                }
+
+            }
+        );
+
+    }
+
+
+    if (data?.volumes) {
+
+        [
+            "master",
+            "tick",
+            "result",
+            "death",
+            "jackpot"
+        ]
+        .forEach(
+            key => {
+
+                const value =
+                    Number(
+                        data.volumes[key]
+                    );
+
+                if (Number.isFinite(value)) {
+                    state.volumes[key] =
+                        Math.max(
+                            0,
+                            Math.min(100, value)
+                        );
                 }
 
             }
@@ -2370,6 +2637,35 @@ function applyState(state) {
         "beetsEnabled"
     ).checked =
         state.enabled.beets;
+
+
+    document.getElementById(
+        "masterVolume"
+    ).value =
+        state.volumes.master;
+
+    document.getElementById(
+        "tickVolume"
+    ).value =
+        state.volumes.tick;
+
+    document.getElementById(
+        "resultVolume"
+    ).value =
+        state.volumes.result;
+
+    document.getElementById(
+        "deathVolume"
+    ).value =
+        state.volumes.death;
+
+    document.getElementById(
+        "jackpotVolume"
+    ).value =
+        state.volumes.jackpot;
+
+    updateVolumeLabels();
+    syncSoundVolumes();
 
 
     currentPalette =
@@ -3122,6 +3418,7 @@ function spin() {
     spinning =
         true;
 
+    lastTickIndex = -1;
 
     canvas.classList.add(
         "spinning"
@@ -3199,6 +3496,48 @@ function spin() {
 
         drawWheel();
 
+        const currentEntries =
+            getEntries();
+
+        if (currentEntries.length) {
+
+            const sliceAngle =
+                Math.PI * 2 /
+                currentEntries.length;
+
+            const tickIndex =
+                Math.floor(
+                    normalizeAngle(-rotation) /
+                    sliceAngle
+                );
+
+            if (tickIndex !== lastTickIndex) {
+
+                lastTickIndex = tickIndex;
+
+                const now =
+                    performance.now();
+
+                if (
+                    now - lastTickTime >=
+                    MIN_TICK_INTERVAL
+                ) {
+
+                    lastTickTime =
+                        now;
+
+                    tickSound.currentTime = 0;
+
+                    tickSound
+                        .play()
+                        .catch(() => {});
+
+                }
+
+            }
+
+        }
+
 
         if (
             progress <
@@ -3232,8 +3571,15 @@ function spin() {
         );
 
 
+        const winner =
+            getWinner();
+
+        playResultSound(
+            winner
+        );
+
         applyResult(
-            getWinner()
+            winner
         );
 
     }
@@ -3882,6 +4228,31 @@ entriesInput.addEventListener(
 
 
 [
+    "masterVolume",
+    "tickVolume",
+    "resultVolume",
+    "deathVolume",
+    "jackpotVolume"
+]
+.forEach(
+    id => {
+
+        document
+            .getElementById(id)
+            .addEventListener(
+                "input",
+                () => {
+                    updateVolumeLabels();
+                    syncSoundVolumes();
+                    saveState();
+                }
+            );
+
+    }
+);
+
+
+[
     "subEnabled",
     "kicksEnabled",
     "donateEnabled",
@@ -4504,6 +4875,72 @@ importFileInput.addEventListener(
     }
 );
 
+function playResultSound(entry) {
+
+    if (!entry) {
+        return;
+    }
+
+
+    const upper =
+        entry
+            .trim()
+            .toUpperCase();
+
+
+    // ÖLÜM özel sesi
+    if (
+        upper === "ÖLÜM" ||
+        upper === "OLUM"
+    ) {
+
+        deathSound.currentTime = 0;
+
+        deathSound
+            .play()
+            .catch(() => {});
+
+        return;
+    }
+
+
+    const currentMultiplier =
+        entry
+            .trim()
+            .toLowerCase()
+            .endsWith("x")
+                ? parseMultiplier(entry)
+                : null;
+
+
+    const highestMultiplier =
+        getHighestMultiplier();
+
+
+    // Çarktaki mevcut en yüksek çarpan
+    if (
+        currentMultiplier !== null &&
+        highestMultiplier !== null &&
+        currentMultiplier === highestMultiplier
+    ) {
+
+        jackpotSound.currentTime = 0;
+
+        jackpotSound
+            .play()
+            .catch(() => {});
+
+        return;
+    }
+
+
+    // geri kalan her şey
+    winSound.currentTime = 0;
+
+    winSound
+        .play()
+        .catch(() => {});
+}
 
 /* START */
 

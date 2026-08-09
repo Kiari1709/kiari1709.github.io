@@ -1,0 +1,4524 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>efel | Kiari</title>
+
+<style>
+:root {
+    --bg: #090a0d;
+    --panel: #13151a;
+    --panel2: #191c22;
+    --border: #292d36;
+    --text: #f3f4f6;
+    --muted: #9097a5;
+    --accent: #7c3aed;
+    --accent-hover: #8b5cf6;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+
+    background:
+        radial-gradient(
+            circle at top,
+            #171923 0%,
+            #090a0d 48%
+        );
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    color: inherit;
+}
+
+/* HEADER */
+
+.topbar {
+    height: 58px;
+    padding: 8px 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: rgba(9, 10, 13, 0.96);
+    border-bottom: 1px solid var(--border);
+
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.config-toggle {
+    padding: 8px 13px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--panel2);
+    cursor: pointer;
+}
+
+.config-toggle:hover {
+    background: #252934;
+}
+
+/* CONFIG DRAWER */
+
+.config-panel {
+    position: fixed;
+    top: 58px;
+    right: 0;
+    bottom: 0;
+
+    width: min(820px, 96vw);
+
+    padding: 16px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    background: rgba(14, 16, 20, 0.985);
+    border-left: 1px solid var(--border);
+
+    box-shadow:
+        -20px 0 55px rgba(0, 0, 0, 0.5);
+
+    z-index: 80;
+
+    transform: translateX(100%);
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        transform 0.24s ease,
+        opacity 0.24s ease;
+}
+
+.config-panel.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.config-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 14px;
+}
+
+.config-title {
+    margin: 0;
+    font-size: 20px;
+}
+
+.config-close {
+    width: 36px;
+    height: 36px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: #22252c;
+
+    cursor: pointer;
+
+    font-size: 19px;
+}
+
+.config-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 14px;
+}
+
+.config-section {
+    min-width: 0;
+
+    padding: 14px;
+
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.config-section.full {
+    grid-column: 1 / -1;
+}
+
+.config-section h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+}
+
+.config-section h3 {
+    margin: 14px 0 7px;
+    font-size: 13px;
+    color: #d3d6dd;
+}
+
+/* ENTRIES */
+
+textarea {
+    width: 100%;
+    height: 220px;
+
+    resize: vertical;
+
+    padding: 10px;
+
+    color: white;
+    background: #0b0d10;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    outline: none;
+}
+
+/* YENİ DAKİKA AYARLARI */
+
+.setting-list {
+    display: grid;
+    gap: 10px;
+}
+
+.setting-row {
+    width: 100%;
+    min-width: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(110px, 0.8fr)
+        minmax(170px, 1.2fr);
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px 14px;
+
+    background: #101216;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.setting-category {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.setting-category input[type="checkbox"] {
+    flex: 0 0 auto;
+
+    width: 16px;
+    height: 16px;
+
+    margin: 0;
+
+    accent-color: #2388ff;
+}
+
+.setting-value {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.setting-value input[type="number"] {
+    flex: 0 0 76px;
+
+    width: 76px;
+    min-width: 76px;
+
+    padding: 8px 9px;
+
+    color: white;
+    background: #090b0e;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    outline: none;
+}
+
+.setting-value span {
+    min-width: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+/* PALETTE */
+
+.palette-list {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.palette-btn {
+    height: 48px;
+    padding: 0;
+
+    overflow: hidden;
+
+    border: 2px solid transparent;
+    border-radius: 8px;
+
+    background: none;
+    cursor: pointer;
+}
+
+.palette-btn.active {
+    border-color: white;
+}
+
+.palette-preview {
+    height: 100%;
+    display: flex;
+}
+
+.palette-preview span {
+    flex: 1;
+}
+
+/* IMAGE */
+
+.image-area {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    gap: 8px;
+    align-items: center;
+
+    margin-top: 10px;
+}
+
+.image-area input[type="file"] {
+    width: 100%;
+    min-width: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+.small-btn {
+    padding: 7px 10px;
+
+    background: #292d35;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 11px;
+}
+
+/* IMPORT EXPORT */
+
+.io-actions {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+}
+
+.action-btn {
+    min-height: 42px;
+    padding: 8px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: #242831;
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.action-btn.export {
+    background: #1f3b2a;
+    border-color: #2f6041;
+}
+
+.action-btn.import {
+    background: #202f49;
+    border-color: #344e78;
+}
+
+.action-btn.reset {
+    background: #422020;
+    border-color: #683030;
+}
+
+/* MAIN */
+
+.main {
+    width: 100%;
+    max-width: 1600px;
+
+    min-height: calc(100vh - 58px);
+
+    margin: auto;
+    padding: 14px;
+
+    display: grid;
+
+    grid-template-columns:
+        285px
+        minmax(400px, 1fr)
+        285px;
+
+    gap: 14px;
+
+    align-items: center;
+}
+
+/* LEFT */
+
+.side-panel {
+    min-width: 0;
+
+    padding: 12px;
+
+    background: rgba(19, 21, 26, 0.96);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.side-title {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.selection-summary {
+    margin-bottom: 8px;
+    padding: 8px;
+
+    background: #0e1014;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    font-size: 12px;
+    color: #c8cbd2;
+}
+
+.empty-btn {
+    width: 100%;
+    height: 31px;
+
+    margin-bottom: 9px;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    background: #252830;
+
+    cursor: pointer;
+
+    font-size: 12px;
+}
+
+.empty-btn.active {
+    background: var(--accent);
+}
+
+.button-group {
+    margin-bottom: 9px;
+}
+
+.button-group.hidden {
+    display: none;
+}
+
+.group-title {
+    margin-bottom: 5px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    color: #d5d7de;
+
+    text-transform: uppercase;
+}
+
+.group-buttons {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 5px;
+}
+
+.value-btn {
+    height: 31px;
+
+    padding: 2px 3px;
+
+    background: #20232a;
+
+    border: 1px solid #343944;
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 11px;
+}
+
+.value-btn:hover {
+    background: #2b303a;
+}
+
+.value-btn.active {
+    background: var(--accent);
+    border-color: var(--accent-hover);
+}
+
+/* WHEEL */
+
+.wheel-section {
+    min-width: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wheel-wrapper {
+    position: relative;
+
+    width:
+        min(
+            66vh,
+            680px,
+            100%
+        );
+
+    aspect-ratio: 1 / 1;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    cursor: pointer;
+
+    user-select: none;
+    -webkit-user-select: none;
+
+    filter:
+        drop-shadow(
+            0 15px 30px
+            rgba(0, 0, 0, 0.38)
+        );
+}
+
+canvas:hover {
+    filter:
+        brightness(1.06)
+        drop-shadow(
+            0 15px 30px
+            rgba(0, 0, 0, 0.38)
+        );
+}
+
+canvas.spinning {
+    cursor: not-allowed;
+}
+
+.pointer {
+    position: absolute;
+
+    right: -8px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 0;
+    height: 0;
+
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+    border-right: 39px solid #f3f4f6;
+
+    pointer-events: none;
+
+    z-index: 10;
+}
+
+/* RIGHT */
+
+.right-panel {
+    display: grid;
+    gap: 10px;
+}
+
+.stat-card,
+.result-card {
+    background: rgba(19, 21, 26, 0.96);
+
+    border: 1px solid var(--border);
+    border-radius: 13px;
+}
+
+.stat-card {
+    padding: 15px 12px;
+    text-align: center;
+}
+
+.stat-title {
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size:
+        clamp(
+            22px,
+            2.3vw,
+            34px
+        );
+
+    font-weight: 900;
+}
+
+.stat-info {
+    margin-top: 5px;
+
+    color: #686f7c;
+
+    font-size: 10px;
+}
+
+.result-card {
+    min-height: 125px;
+
+    padding: 13px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    text-align: center;
+}
+
+.last-result-title {
+    margin-bottom: 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.last-wheel-result {
+    margin-bottom: 7px;
+
+    font-size: 25px;
+    font-weight: 900;
+}
+
+.last-result-description {
+    color: #adb2bd;
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.right-action-btn {
+    width: 100%;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.undo-btn {
+    background: #1d2740;
+
+    border: 1px solid #31466f;
+
+    color: #c7d7ff;
+}
+
+.undo-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.reset-times-btn {
+    background: #271919;
+
+    border: 1px solid #453131;
+
+    color: #f3c5c5;
+}
+
+/* MODAL */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 120;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.72);
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modal-box {
+    width: min(390px, 100%);
+
+    padding: 20px;
+
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.modal-title {
+    margin-bottom: 6px;
+
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.modal-subtitle {
+    margin-bottom: 14px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.custom-input {
+    width: 100%;
+
+    padding: 11px;
+
+    color: white;
+    background: #090b0e;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    outline: none;
+}
+
+.modal-buttons {
+    margin-top: 12px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+}
+
+.modal-button {
+    padding: 9px;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #30343d;
+}
+
+.confirm-btn {
+    background: var(--accent);
+}
+
+.danger-btn {
+    background: #7f1d1d;
+}
+
+/* TOAST */
+
+.toast {
+    position: fixed;
+
+    left: 50%;
+    bottom: 20px;
+
+    transform: translate(-50%, 20px);
+
+    z-index: 200;
+
+    padding: 10px 16px;
+
+    background: rgba(24, 27, 33, 0.98);
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.2s,
+        transform 0.2s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+    .main {
+        grid-template-columns: 1fr;
+    }
+
+    .wheel-section {
+        order: 1;
+    }
+
+    .side-panel {
+        order: 2;
+    }
+
+    .right-panel {
+        order: 3;
+    }
+}
+
+@media (max-width: 760px) {
+
+    .config-panel {
+        width: 100%;
+    }
+
+    .config-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .config-section.full {
+        grid-column: auto;
+    }
+
+    .io-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .setting-row {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .setting-value {
+        padding-left: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="logo">
+        HELL YEAAAAAAH
+    </div>
+
+    <button
+        id="configToggle"
+        class="config-toggle"
+    >
+        ⚙
+    </button>
+
+</header>
+
+
+<section
+    id="configPanel"
+    class="config-panel"
+>
+
+    <div class="config-header">
+
+        <h1 class="config-title">
+            Ayarlar
+        </h1>
+
+        <button
+            id="configClose"
+            class="config-close"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div class="config-grid">
+
+
+        <div class="config-section">
+
+            <h2>
+                Hesaplama
+            </h2>
+
+
+            <h3>
+                Çark Değerleri
+            </h3>
+
+
+            <textarea
+                id="entriesInput"
+            ></textarea>
+
+
+            <h3>
+                Dakika Değerleri
+            </h3>
+
+
+            <div class="setting-list">
+
+
+                <div class="setting-row">
+
+                    <div class="setting-category">
+
+                        <input
+                            id="subEnabled"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            Abone
+                        </span>
+
+                    </div>
+
+
+                    <div class="setting-value">
+
+                        <input
+                            id="subMinutes"
+                            type="number"
+                            min="0"
+                            step="0.1"
+                        >
+
+                        <span>
+                            dakika / 1
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setting-row">
+
+                    <div class="setting-category">
+
+                        <input
+                            id="kicksEnabled"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            Kicks
+                        </span>
+
+                    </div>
+
+
+                    <div class="setting-value">
+
+                        <input
+                            id="kicksMinutes"
+                            type="number"
+                            min="0"
+                            step="0.1"
+                        >
+
+                        <span>
+                            dakika / 100
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setting-row">
+
+                    <div class="setting-category">
+
+                        <input
+                            id="donateEnabled"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            Donate
+                        </span>
+
+                    </div>
+
+
+                    <div class="setting-value">
+
+                        <input
+                            id="donateMinutes"
+                            type="number"
+                            min="0"
+                            step="0.1"
+                        >
+
+                        <span>
+                            dakika / 100 TL
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="setting-row">
+
+                    <div class="setting-category">
+
+                        <input
+                            id="beetsEnabled"
+                            type="checkbox"
+                        >
+
+                        <span>
+                            Beets
+                        </span>
+
+                    </div>
+
+
+                    <div class="setting-value">
+
+                        <input
+                            id="beetsMinutes"
+                            type="number"
+                            min="0"
+                            step="0.1"
+                        >
+
+                        <span>
+                            dakika / 100
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="config-section">
+
+            <h2>
+                Çark Görünümü
+            </h2>
+
+
+            <h3>
+                Renk Paleti
+            </h3>
+
+
+            <div class="palette-list">
+
+                <button
+                    class="palette-btn"
+                    data-palette="mono"
+                >
+                    <div class="palette-preview">
+                        <span style="background:#111"></span>
+                        <span style="background:#555"></span>
+                        <span style="background:#aaa"></span>
+                        <span style="background:#eee"></span>
+                    </div>
+                </button>
+
+
+                <button
+                    class="palette-btn"
+                    data-palette="neon"
+                >
+                    <div class="palette-preview">
+                        <span style="background:#3A73E8"></span>
+                        <span style="background:#D51828"></span>
+                        <span style="background:#E8B718"></span>
+                        <span style="background:#099828"></span>
+                    </div>
+                </button>
+
+
+                <button
+                    class="palette-btn"
+                    data-palette="fire"
+                >
+                    <div class="palette-preview">
+                        <span style="background:#F8C838"></span>
+                        <span style="background:#F89808"></span>
+                        <span style="background:#D04810"></span>
+                        <span style="background:#F8F8F8"></span>
+                    </div>
+                </button>
+
+            </div>
+
+
+            <h3>
+                Merkez Resmi
+            </h3>
+
+
+            <div class="image-area">
+
+                <input
+                    id="centerImageInput"
+                    type="file"
+                    accept="image/*"
+                >
+
+                <button
+                    id="removeImageBtn"
+                    class="small-btn"
+                >
+                    Resmi Kaldır
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="config-section full">
+
+            <h2>
+                Import / Export
+            </h2>
+
+
+            <div class="io-actions">
+
+                <button
+                    id="exportButton"
+                    class="action-btn export"
+                >
+                    ↓ Export JSON
+                </button>
+
+                <button
+                    id="importButton"
+                    class="action-btn import"
+                >
+                    ↑ Import JSON
+                </button>
+
+                <button
+                    id="resetSettingsButton"
+                    class="action-btn reset"
+                >
+                    Default Ayarlara Dön
+                </button>
+
+            </div>
+
+
+            <input
+                id="importFileInput"
+                type="file"
+                accept=".json,application/json"
+                hidden
+            >
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<main class="main">
+
+
+    <aside class="side-panel">
+
+        <h2 class="side-title">
+            Seçim
+        </h2>
+
+        <div
+            id="selectionSummary"
+            class="selection-summary"
+        >
+            Seçim yapılmadı.
+        </div>
+
+        <button
+            id="emptySelection"
+            class="empty-btn"
+        >
+            Temizle
+        </button>
+
+
+        <div
+            id="subGroup"
+            class="button-group"
+        >
+
+            <div class="group-title">
+                Abone
+            </div>
+
+            <div class="group-buttons">
+
+                <button class="value-btn" data-type="sub" data-value="1">1</button>
+                <button class="value-btn" data-type="sub" data-value="5">5</button>
+                <button class="value-btn" data-type="sub" data-value="10">10</button>
+                <button class="value-btn" data-type="sub" data-value="25">25</button>
+                <button class="value-btn" data-type="sub" data-value="50">50</button>
+                <button class="value-btn" data-type="sub" data-value="100">100</button>
+                <button class="value-btn" data-type="sub" data-value="200">200</button>
+                <button class="value-btn" data-type="sub" data-value="500">500</button>
+
+                <button
+                    class="value-btn custom-btn"
+                    data-type="sub"
+                >
+                    Custom
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="kicksGroup"
+            class="button-group"
+        >
+
+            <div class="group-title">
+                Kıcks
+            </div>
+
+            <div class="group-buttons">
+
+                <button class="value-btn" data-type="kicks" data-value="50">50</button>
+                <button class="value-btn" data-type="kicks" data-value="100">100</button>
+                <button class="value-btn" data-type="kicks" data-value="500">500</button>
+                <button class="value-btn" data-type="kicks" data-value="1000">1K</button>
+                <button class="value-btn" data-type="kicks" data-value="2000">2K</button>
+                <button class="value-btn" data-type="kicks" data-value="5000">5K</button>
+                <button class="value-btn" data-type="kicks" data-value="10000">10K</button>
+                <button class="value-btn" data-type="kicks" data-value="50000">50K</button>
+
+                <button
+                    class="value-btn custom-btn"
+                    data-type="kicks"
+                >
+                    Custom
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="beetsGroup"
+            class="button-group"
+        >
+
+            <div class="group-title">
+                Beets
+            </div>
+
+            <div class="group-buttons">
+
+                <button class="value-btn" data-type="beets" data-value="50">50</button>
+                <button class="value-btn" data-type="beets" data-value="100">100</button>
+                <button class="value-btn" data-type="beets" data-value="250">250</button>
+                <button class="value-btn" data-type="beets" data-value="500">500</button>
+                <button class="value-btn" data-type="beets" data-value="666">666</button>
+
+                <button
+                    class="value-btn custom-btn"
+                    data-type="beets"
+                >
+                    Custom
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="donateGroup"
+            class="button-group"
+        >
+
+            <div class="group-title">
+                Donate
+            </div>
+
+            <div class="group-buttons">
+
+                <button class="value-btn" data-type="donate" data-value="100">100</button>
+                <button class="value-btn" data-type="donate" data-value="200">200</button>
+                <button class="value-btn" data-type="donate" data-value="250">250</button>
+                <button class="value-btn" data-type="donate" data-value="500">500</button>
+                <button class="value-btn" data-type="donate" data-value="1000">1K</button>
+                <button class="value-btn" data-type="donate" data-value="2000">2K</button>
+                <button class="value-btn" data-type="donate" data-value="5000">5K</button>
+                <button class="value-btn" data-type="donate" data-value="10000">10K</button>
+
+                <button
+                    class="value-btn custom-btn"
+                    data-type="donate"
+                >
+                    Custom
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <section class="wheel-section">
+
+        <div class="wheel-wrapper">
+
+            <canvas
+                id="wheel"
+                width="900"
+                height="900"
+            ></canvas>
+
+            <div class="pointer"></div>
+
+        </div>
+
+    </section>
+
+
+    <aside class="right-panel">
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Normal
+            </div>
+
+            <div
+                id="normalTime"
+                class="stat-value"
+            >
+                00:00:00
+            </div>
+
+            <div class="stat-info">
+  
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Çarpanlı
+            </div>
+
+            <div
+                id="multipliedTime"
+                class="stat-value"
+            >
+                00:00:00
+            </div>
+
+            <div class="stat-info">
+            </div>
+
+        </div>
+
+
+        <div class="result-card">
+
+            <div class="last-result-title">
+                Son Sonuç
+            </div>
+
+            <div
+                id="lastWheelResult"
+                class="last-wheel-result"
+            >
+                -
+            </div>
+
+            <div
+                id="lastResultDescription"
+                class="last-result-description"
+            >
+                Henüz çark çevrilmedi.
+            </div>
+
+        </div>
+
+
+        <button
+            id="undoLastResultButton"
+            class="right-action-btn undo-btn"
+        >
+            ↶ Son Sonucu İptal Et
+        </button>
+
+
+        <button
+            id="resetTimesButton"
+            class="right-action-btn reset-times-btn"
+        >
+            Sayaçları Sıfırla
+        </button>
+
+    </aside>
+
+</main>
+
+
+<!-- CUSTOM MODAL -->
+
+<div
+    id="customModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+            Custom Değer
+        </div>
+
+        <div
+            id="customModalSubtitle"
+            class="modal-subtitle"
+        >
+            Değer gir
+        </div>
+
+        <input
+            id="customValueInput"
+            class="custom-input"
+            type="number"
+            min="0"
+            step="0.01"
+        >
+
+        <div class="modal-buttons">
+
+            <button
+                id="customCancel"
+                class="modal-button cancel-btn"
+            >
+                İptal
+            </button>
+
+            <button
+                id="customConfirm"
+                class="modal-button confirm-btn"
+            >
+                Seç
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- RESET ALL MODAL -->
+
+<div
+    id="resetModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+            Default Ayarlara Dön
+        </div>
+
+        <div class="modal-subtitle">
+            Bütün kayıtlı ayarlar ve sayaçlar varsayılana dönecek.
+        </div>
+
+        <div class="modal-buttons">
+
+            <button
+                id="resetCancel"
+                class="modal-button cancel-btn"
+            >
+                İptal
+            </button>
+
+            <button
+                id="resetConfirm"
+                class="modal-button danger-btn"
+            >
+                Sıfırla
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- RESET TIMES MODAL -->
+
+<div
+    id="resetTimesModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+            Sayaçları Sıfırla
+        </div>
+
+        <div class="modal-subtitle">
+            Normal ve Çarpanlı sayaçlar sıfırlanacak.
+        </div>
+
+        <div class="modal-buttons">
+
+            <button
+                id="resetTimesCancel"
+                class="modal-button cancel-btn"
+            >
+                İptal
+            </button>
+
+            <button
+                id="resetTimesConfirm"
+                class="modal-button danger-btn"
+            >
+                Sıfırla
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script>
+
+/* STORAGE */
+
+const STORAGE_KEY =
+    "streamWheelSettings_v6";
+
+
+const DEFAULT_STATE = {
+
+    version: 6,
+
+    entries: [
+        "ÖLÜM",
+        "10x",
+        "7.5x",
+        "2x",
+        "1.75x",
+        "PAS",
+        "0.5x",
+        "1x",
+        "0.5x",
+        "1.75x",
+        "1.5x",
+        "3x",
+        "1x",
+        "1.5x",
+        "PAS",
+        "1.5x",
+        "1.5x",
+        "1.75x",
+        "5x",
+        "2x",
+        "0.75x",
+        "PAS",
+        "0.5x",
+        "1.5x",
+        "1x",
+        "0.5x"
+    ],
+
+    minutes: {
+        sub: 20,
+        kicks: 5,
+        donate: 10,
+        beets: 3
+    },
+
+    enabled: {
+        sub: true,
+        kicks: true,
+        donate: true,
+        beets: true
+    },
+
+    palette: "mono",
+
+    centerImageData: null,
+
+    normalTotalMinutes: 0,
+
+    multipliedTotalMinutes: 0,
+
+    selected: null,
+
+    lastApplied: null,
+
+    lastResult: {
+        result: "-",
+        description:
+            "Henüz çark çevrilmedi."
+    }
+
+};
+
+
+/* ELEMENTS */
+
+const canvas =
+    document.getElementById("wheel");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+const entriesInput =
+    document.getElementById("entriesInput");
+
+
+const configToggle =
+    document.getElementById("configToggle");
+
+const configPanel =
+    document.getElementById("configPanel");
+
+const configClose =
+    document.getElementById("configClose");
+
+
+const selectionSummary =
+    document.getElementById("selectionSummary");
+
+const emptySelection =
+    document.getElementById("emptySelection");
+
+
+const normalTimeElement =
+    document.getElementById("normalTime");
+
+const multipliedTimeElement =
+    document.getElementById("multipliedTime");
+
+
+const lastWheelResult =
+    document.getElementById("lastWheelResult");
+
+const lastResultDescription =
+    document.getElementById("lastResultDescription");
+
+
+const undoLastResultButton =
+    document.getElementById("undoLastResultButton");
+
+const resetTimesButton =
+    document.getElementById("resetTimesButton");
+
+
+const centerImageInput =
+    document.getElementById("centerImageInput");
+
+const removeImageBtn =
+    document.getElementById("removeImageBtn");
+
+
+const exportButton =
+    document.getElementById("exportButton");
+
+const importButton =
+    document.getElementById("importButton");
+
+const importFileInput =
+    document.getElementById("importFileInput");
+
+
+const resetSettingsButton =
+    document.getElementById("resetSettingsButton");
+
+
+const customModal =
+    document.getElementById("customModal");
+
+const customModalSubtitle =
+    document.getElementById("customModalSubtitle");
+
+const customValueInput =
+    document.getElementById("customValueInput");
+
+const customConfirm =
+    document.getElementById("customConfirm");
+
+const customCancel =
+    document.getElementById("customCancel");
+
+
+const resetModal =
+    document.getElementById("resetModal");
+
+const resetCancel =
+    document.getElementById("resetCancel");
+
+const resetConfirm =
+    document.getElementById("resetConfirm");
+
+
+const resetTimesModal =
+    document.getElementById("resetTimesModal");
+
+const resetTimesCancel =
+    document.getElementById("resetTimesCancel");
+
+const resetTimesConfirm =
+    document.getElementById("resetTimesConfirm");
+
+
+const toast =
+    document.getElementById("toast");
+
+
+/* STATE */
+
+let rotation = 0;
+let spinning = false;
+
+let selected = null;
+
+let centerImage = null;
+let centerImageData = null;
+
+let currentPalette = "mono";
+
+let normalTotalMinutes = 0;
+let multipliedTotalMinutes = 0;
+
+let lastApplied = null;
+
+let pendingCustomType = null;
+let pendingCustomButton = null;
+
+let lastResultState = {
+    result: "-",
+    description:
+        "Henüz çark çevrilmedi."
+};
+
+
+/* PALETTES */
+
+const palettes = {
+
+    mono: [
+        "#111111",
+        "#555555",
+        "#d2d2d2",
+        "#f3f3f3"
+    ],
+
+    neon: [
+        "#3A73E8",
+        "#D51828",
+        "#E8B718",
+        "#099828"
+    ],
+
+    fire: [
+        "#F8C838",
+        "#F89808",
+        "#D04810",
+        "#F8E088",
+        "#F8F8F8"
+    ]
+
+};
+
+
+/* HELPERS */
+
+function cloneObject(object) {
+    return JSON.parse(
+        JSON.stringify(object)
+    );
+}
+
+
+function getEntries() {
+
+    return entriesInput.value
+        .split("\n")
+        .map(
+            entry => entry.trim()
+        )
+        .filter(Boolean);
+
+}
+
+
+function getNumberValue(id) {
+
+    const value =
+        Number(
+            document.getElementById(id).value
+        );
+
+    return (
+        Number.isFinite(value) &&
+        value >= 0
+    )
+        ? value
+        : 0;
+
+}
+
+
+/* TOAST */
+
+let toastTimer = null;
+
+
+function showToast(message) {
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(
+            () => {
+                toast.classList.remove("show");
+            },
+            2200
+        );
+
+}
+
+
+/* SAVE */
+
+function buildState() {
+
+    return {
+
+        version: 6,
+
+        entries:
+            getEntries(),
+
+        minutes: {
+
+            sub:
+                getNumberValue("subMinutes"),
+
+            kicks:
+                getNumberValue("kicksMinutes"),
+
+            donate:
+                getNumberValue("donateMinutes"),
+
+            beets:
+                getNumberValue("beetsMinutes")
+
+        },
+
+        enabled: {
+
+            sub:
+                document.getElementById("subEnabled").checked,
+
+            kicks:
+                document.getElementById("kicksEnabled").checked,
+
+            donate:
+                document.getElementById("donateEnabled").checked,
+
+            beets:
+                document.getElementById("beetsEnabled").checked
+
+        },
+
+        palette:
+            currentPalette,
+
+        centerImageData:
+            centerImageData,
+
+        normalTotalMinutes:
+            normalTotalMinutes,
+
+        multipliedTotalMinutes:
+            multipliedTotalMinutes,
+
+        selected:
+            selected,
+
+        lastApplied:
+            lastApplied,
+
+        lastResult:
+            lastResultState
+
+    };
+
+}
+
+
+function saveState() {
+
+    try {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(
+                buildState()
+            )
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "Browser kaydı yapılamadı."
+        );
+
+    }
+
+}
+
+
+/* NORMALIZE */
+
+function normalizeImportedState(data) {
+
+    const state =
+        cloneObject(
+            DEFAULT_STATE
+        );
+
+
+    if (
+        data &&
+        Array.isArray(data.entries)
+    ) {
+
+        state.entries =
+            data.entries
+                .map(
+                    item => String(item).trim()
+                )
+                .filter(Boolean);
+
+    }
+
+
+    if (data?.minutes) {
+
+        [
+            "sub",
+            "kicks",
+            "donate",
+            "beets"
+        ]
+        .forEach(
+            key => {
+
+                const value =
+                    Number(
+                        data.minutes[key]
+                    );
+
+
+                if (
+                    Number.isFinite(value) &&
+                    value >= 0
+                ) {
+
+                    state.minutes[key] =
+                        value;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (data?.enabled) {
+
+        [
+            "sub",
+            "kicks",
+            "donate",
+            "beets"
+        ]
+        .forEach(
+            key => {
+
+                if (
+                    typeof data.enabled[key] ===
+                    "boolean"
+                ) {
+
+                    state.enabled[key] =
+                        data.enabled[key];
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (
+        typeof data?.palette === "string" &&
+        palettes[data.palette]
+    ) {
+
+        state.palette =
+            data.palette;
+
+    }
+
+
+    if (
+        typeof data?.centerImageData ===
+        "string"
+
+        ||
+
+        data?.centerImageData === null
+    ) {
+
+        state.centerImageData =
+            data.centerImageData;
+
+    }
+
+
+    const normal =
+        Number(
+            data?.normalTotalMinutes
+        );
+
+    if (
+        Number.isFinite(normal) &&
+        normal >= 0
+    ) {
+
+        state.normalTotalMinutes =
+            normal;
+
+    }
+
+
+    const multiplied =
+        Number(
+            data?.multipliedTotalMinutes
+        );
+
+    if (
+        Number.isFinite(multiplied) &&
+        multiplied >= 0
+    ) {
+
+        state.multipliedTotalMinutes =
+            multiplied;
+
+    }
+
+
+    if (
+        data?.selected &&
+        typeof data.selected === "object"
+    ) {
+
+        const type =
+            data.selected.type;
+
+        const value =
+            Number(
+                data.selected.value
+            );
+
+
+        if (
+            [
+                "sub",
+                "kicks",
+                "beets",
+                "donate"
+            ].includes(type)
+
+            &&
+
+            Number.isFinite(value)
+
+            &&
+
+            value > 0
+        ) {
+
+            state.selected = {
+                type,
+                value
+            };
+
+        }
+
+    }
+
+
+    if (
+        data?.lastApplied &&
+        typeof data.lastApplied === "object"
+    ) {
+
+        const normalAdded =
+            Number(
+                data.lastApplied.normalAdded
+            );
+
+        const multipliedAdded =
+            Number(
+                data.lastApplied.multipliedAdded
+            );
+
+
+        if (
+            Number.isFinite(normalAdded) &&
+            Number.isFinite(multipliedAdded)
+        ) {
+
+            state.lastApplied = {
+
+                normalAdded,
+
+                multipliedAdded,
+
+                result:
+                    data.lastApplied.result || "-"
+
+            };
+
+        }
+
+    }
+
+
+    if (
+        data?.lastResult &&
+        typeof data.lastResult === "object"
+    ) {
+
+        state.lastResult = {
+
+            result:
+                data.lastResult.result || "-",
+
+            description:
+                data.lastResult.description ||
+                "Henüz çark çevrilmedi."
+
+        };
+
+    }
+
+
+    return state;
+
+}
+
+
+/* LOAD */
+
+function loadStoredState() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+
+        if (!raw) {
+
+            return cloneObject(
+                DEFAULT_STATE
+            );
+
+        }
+
+
+        return normalizeImportedState(
+            JSON.parse(raw)
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        return cloneObject(
+            DEFAULT_STATE
+        );
+
+    }
+
+}
+
+
+/* APPLY STATE */
+
+function applyState(state) {
+
+    entriesInput.value =
+        state.entries.join("\n");
+
+
+    document.getElementById(
+        "subMinutes"
+    ).value =
+        state.minutes.sub;
+
+
+    document.getElementById(
+        "kicksMinutes"
+    ).value =
+        state.minutes.kicks;
+
+
+    document.getElementById(
+        "donateMinutes"
+    ).value =
+        state.minutes.donate;
+
+
+    document.getElementById(
+        "beetsMinutes"
+    ).value =
+        state.minutes.beets;
+
+
+    document.getElementById(
+        "subEnabled"
+    ).checked =
+        state.enabled.sub;
+
+
+    document.getElementById(
+        "kicksEnabled"
+    ).checked =
+        state.enabled.kicks;
+
+
+    document.getElementById(
+        "donateEnabled"
+    ).checked =
+        state.enabled.donate;
+
+
+    document.getElementById(
+        "beetsEnabled"
+    ).checked =
+        state.enabled.beets;
+
+
+    currentPalette =
+        state.palette;
+
+
+    centerImageData =
+        state.centerImageData;
+
+
+    normalTotalMinutes =
+        state.normalTotalMinutes;
+
+
+    multipliedTotalMinutes =
+        state.multipliedTotalMinutes;
+
+
+    selected =
+        state.selected;
+
+
+    lastApplied =
+        state.lastApplied;
+
+
+    lastResultState =
+        state.lastResult;
+
+
+    syncPaletteButtons();
+
+    syncVisibility();
+
+    restoreSelectedButton();
+
+    updateTimes();
+
+    updateLastResult();
+
+    updateUndoButton();
+
+    loadCenterImageFromData(
+        centerImageData
+    );
+
+    drawWheel();
+
+}
+
+
+/* COLOR */
+
+function isDarkColor(hex) {
+
+    const value =
+        hex.replace("#", "");
+
+
+    const r =
+        parseInt(
+            value.substring(0, 2),
+            16
+        );
+
+    const g =
+        parseInt(
+            value.substring(2, 4),
+            16
+        );
+
+    const b =
+        parseInt(
+            value.substring(4, 6),
+            16
+        );
+
+
+    const luminance =
+        0.299 * r +
+        0.587 * g +
+        0.114 * b;
+
+
+    return luminance < 150;
+
+}
+
+
+/* DRAW */
+
+function drawWheel() {
+
+    const entries =
+        getEntries();
+
+
+    const width =
+        canvas.width;
+
+    const height =
+        canvas.height;
+
+
+    const centerX =
+        width / 2;
+
+    const centerY =
+        height / 2;
+
+
+    const radius =
+        Math.min(
+            width,
+            height
+        ) / 2 - 14;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if (!entries.length) {
+
+        return;
+
+    }
+
+
+    const sliceAngle =
+        Math.PI * 2 /
+        entries.length;
+
+
+    const palette =
+        palettes[
+            currentPalette
+        ];
+
+
+    entries.forEach(
+        (entry, index) => {
+
+
+            const start =
+                rotation +
+                index *
+                sliceAngle;
+
+
+            const end =
+                start +
+                sliceAngle;
+
+
+            const color =
+                palette[
+                    index %
+                    palette.length
+                ];
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                centerX,
+                centerY
+            );
+
+            ctx.arc(
+                centerX,
+                centerY,
+                radius,
+                start,
+                end
+            );
+
+            ctx.closePath();
+
+
+            ctx.fillStyle =
+                color;
+
+            ctx.fill();
+
+
+            ctx.strokeStyle =
+                "rgba(255,255,255,.25)";
+
+            ctx.lineWidth =
+                2;
+
+            ctx.stroke();
+
+
+            ctx.save();
+
+            ctx.translate(
+                centerX,
+                centerY
+            );
+
+
+            ctx.rotate(
+                start +
+                sliceAngle / 2
+            );
+
+
+            ctx.textAlign =
+                "right";
+
+            ctx.textBaseline =
+                "middle";
+
+
+            ctx.fillStyle =
+                isDarkColor(color)
+                    ? "#fff"
+                    : "#111";
+
+
+            ctx.font =
+                entries.length > 24
+                    ? "600 19px Arial"
+                    : "600 25px Arial";
+
+
+            ctx.fillText(
+                entry,
+                radius - 28,
+                0
+            );
+
+
+            ctx.restore();
+
+        }
+    );
+
+
+    const centerRadius =
+        radius * 0.34;
+
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.arc(
+        centerX,
+        centerY,
+        centerRadius,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.clip();
+
+
+    if (centerImage) {
+
+        const scale =
+            Math.max(
+
+                centerRadius * 2 /
+                centerImage.width,
+
+                centerRadius * 2 /
+                centerImage.height
+
+            );
+
+
+        const imageWidth =
+            centerImage.width *
+            scale;
+
+        const imageHeight =
+            centerImage.height *
+            scale;
+
+
+        ctx.drawImage(
+
+            centerImage,
+
+            centerX -
+            imageWidth / 2,
+
+            centerY -
+            imageHeight / 2,
+
+            imageWidth,
+
+            imageHeight
+
+        );
+
+    } else {
+
+        ctx.fillStyle =
+            "#0e1014";
+
+
+        ctx.fillRect(
+
+            centerX -
+            centerRadius,
+
+            centerY -
+            centerRadius,
+
+            centerRadius * 2,
+
+            centerRadius * 2
+
+        );
+
+
+        ctx.fillStyle =
+            "#fff";
+
+
+        ctx.textAlign =
+            "center";
+
+        ctx.textBaseline =
+            "middle";
+
+
+        ctx.font =
+            "900 37px Arial";
+
+
+        ctx.fillText(
+            "ÇEVİR",
+            centerX,
+            centerY
+        );
+
+    }
+
+
+    ctx.restore();
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        centerX,
+        centerY,
+        centerRadius,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.lineWidth =
+        4;
+
+    ctx.strokeStyle =
+        "#d7dae1";
+
+    ctx.stroke();
+
+}
+
+
+/* WINNER */
+
+function normalizeAngle(angle) {
+
+    const full =
+        Math.PI * 2;
+
+
+    return (
+        (
+            angle %
+            full
+        ) +
+        full
+    ) % full;
+
+}
+
+
+function getWinner() {
+
+    const entries =
+        getEntries();
+
+
+    if (!entries.length) {
+        return null;
+    }
+
+
+    const sliceAngle =
+        Math.PI * 2 /
+        entries.length;
+
+
+    const relative =
+        normalizeAngle(
+            -rotation
+        );
+
+
+    const index =
+        Math.floor(
+            relative /
+            sliceAngle
+        ) %
+        entries.length;
+
+
+    return entries[index];
+
+}
+
+
+/* CALC */
+
+function parseMultiplier(entry) {
+
+    const cleaned =
+        entry
+            .toLowerCase()
+            .replace(",", ".")
+            .replace(/x/g, "")
+            .trim();
+
+
+    const value =
+        Number(cleaned);
+
+
+    return Number.isFinite(value)
+        ? value
+        : null;
+
+}
+
+
+function calculateBaseMinutes() {
+
+    if (!selected) {
+        return 0;
+    }
+
+
+    const value =
+        Number(
+            selected.value
+        );
+
+
+    if (
+        selected.type === "sub"
+    ) {
+
+        return (
+            value *
+            getNumberValue(
+                "subMinutes"
+            )
+        );
+
+    }
+
+
+    if (
+        selected.type === "kicks"
+    ) {
+
+        return (
+            value /
+            100
+        ) *
+        getNumberValue(
+            "kicksMinutes"
+        );
+
+    }
+
+
+    if (
+        selected.type === "donate"
+    ) {
+
+        return (
+            value /
+            100
+        ) *
+        getNumberValue(
+            "donateMinutes"
+        );
+
+    }
+
+
+    if (
+        selected.type === "beets"
+    ) {
+
+        return (
+            value /
+            100
+        ) *
+        getNumberValue(
+            "beetsMinutes"
+        );
+
+    }
+
+
+    return 0;
+
+}
+
+
+/* RESULT */
+
+function setLastResult(
+    result,
+    description
+) {
+
+    lastResultState = {
+        result,
+        description
+    };
+
+
+    updateLastResult();
+
+}
+
+
+function updateLastResult() {
+
+    lastWheelResult.textContent =
+        lastResultState.result;
+
+
+    lastResultDescription.textContent =
+        lastResultState.description;
+
+}
+
+
+function updateUndoButton() {
+
+    undoLastResultButton.disabled =
+        !lastApplied;
+
+}
+
+
+function applyResult(entry) {
+
+    if (!entry) {
+        return;
+    }
+
+
+    const baseMinutes =
+        calculateBaseMinutes();
+
+
+    const upper =
+        entry
+            .toUpperCase()
+            .trim();
+
+
+    if (
+        upper === "PAS"
+    ) {
+
+        lastApplied =
+            null;
+
+
+        setLastResult(
+            "PAS",
+            "Süre eklenmedi. Çarkı tekrar çevirebilirsin."
+        );
+
+
+        updateUndoButton();
+
+        saveState();
+
+        return;
+
+    }
+
+
+    if (
+        upper === "ÖLÜM" ||
+        upper === "OLUM"
+    ) {
+
+        const normalAdded =
+            baseMinutes;
+
+
+        const multipliedAdded =
+            0;
+
+
+        normalTotalMinutes +=
+            normalAdded;
+
+
+        lastApplied = {
+
+            normalAdded,
+
+            multipliedAdded,
+
+            result:
+                "ÖLÜM"
+
+        };
+
+
+        updateTimes();
+
+
+        setLastResult(
+
+            "ÖLÜM",
+
+            `Normal +${formatMinutes(normalAdded)} • Çarpanlı +00:00:00`
+
+        );
+
+
+        updateUndoButton();
+
+        saveState();
+
+        return;
+
+    }
+
+
+    const multiplier =
+        parseMultiplier(
+            entry
+        );
+
+
+    if (
+        multiplier === null
+    ) {
+
+        lastApplied =
+            null;
+
+
+        setLastResult(
+            entry,
+            "Bu entry geçerli bir çarpan değil."
+        );
+
+
+        updateUndoButton();
+
+        saveState();
+
+        return;
+
+    }
+
+
+    const normalAdded =
+        baseMinutes;
+
+
+    const multipliedAdded =
+        baseMinutes *
+        multiplier;
+
+
+    normalTotalMinutes +=
+        normalAdded;
+
+
+    multipliedTotalMinutes +=
+        multipliedAdded;
+
+
+    lastApplied = {
+
+        normalAdded,
+
+        multipliedAdded,
+
+        result:
+            entry
+
+    };
+
+
+    updateTimes();
+
+
+    setLastResult(
+
+        entry,
+
+        `Normal +${formatMinutes(normalAdded)} • Çarpanlı +${formatMinutes(multipliedAdded)}`
+
+    );
+
+
+    updateUndoButton();
+
+    saveState();
+
+}
+
+
+/* SPIN */
+
+function spin() {
+
+    if (spinning) {
+        return;
+    }
+
+
+    const entries =
+        getEntries();
+
+
+    if (!entries.length) {
+        return;
+    }
+
+
+    spinning =
+        true;
+
+
+    canvas.classList.add(
+        "spinning"
+    );
+
+
+    const startRotation =
+        rotation;
+
+
+    const extraTurns =
+        6 +
+        Math.random() * 4;
+
+
+    const randomAngle =
+        Math.random() *
+        Math.PI *
+        2;
+
+
+    const targetRotation =
+        startRotation +
+
+        extraTurns *
+        Math.PI *
+        2 +
+
+        randomAngle;
+
+
+    const duration =
+        4800;
+
+
+    const startTime =
+        performance.now();
+
+
+    function animate(now) {
+
+        const progress =
+            Math.min(
+
+                (
+                    now -
+                    startTime
+                ) /
+                duration,
+
+                1
+
+            );
+
+
+        const eased =
+            1 -
+            Math.pow(
+                1 -
+                progress,
+                4
+            );
+
+
+        rotation =
+            startRotation +
+
+            (
+                targetRotation -
+                startRotation
+            ) *
+
+            eased;
+
+
+        drawWheel();
+
+
+        if (
+            progress <
+            1
+        ) {
+
+            requestAnimationFrame(
+                animate
+            );
+
+            return;
+
+        }
+
+
+        rotation =
+            normalizeAngle(
+                rotation
+            );
+
+
+        drawWheel();
+
+
+        spinning =
+            false;
+
+
+        canvas.classList.remove(
+            "spinning"
+        );
+
+
+        applyResult(
+            getWinner()
+        );
+
+    }
+
+
+    requestAnimationFrame(
+        animate
+    );
+
+}
+
+
+/* TIME */
+
+function formatMinutes(minutes) {
+
+    const totalSeconds =
+        Math.max(
+            0,
+            Math.round(
+                minutes * 60
+            )
+        );
+
+
+    const hours =
+        Math.floor(
+            totalSeconds /
+            3600
+        );
+
+
+    const mins =
+        Math.floor(
+            (
+                totalSeconds %
+                3600
+            ) /
+            60
+        );
+
+
+    const seconds =
+        totalSeconds %
+        60;
+
+
+    return (
+        String(hours).padStart(2, "0")
+        +
+        ":"
+        +
+        String(mins).padStart(2, "0")
+        +
+        ":"
+        +
+        String(seconds).padStart(2, "0")
+    );
+
+}
+
+
+function updateTimes() {
+
+    normalTimeElement.textContent =
+        formatMinutes(
+            normalTotalMinutes
+        );
+
+
+    multipliedTimeElement.textContent =
+        formatMinutes(
+            multipliedTotalMinutes
+        );
+
+}
+
+
+/* SELECTION */
+
+function formatSelectionValue(value) {
+
+    if (
+        value >= 1000
+    ) {
+
+        const k =
+            value /
+            1000;
+
+
+        if (
+            Number.isInteger(k)
+        ) {
+
+            return k + "K";
+
+        }
+
+    }
+
+
+    return value;
+
+}
+
+
+function selectValue(
+    type,
+    value,
+    button = null
+) {
+
+    document
+        .querySelectorAll(
+            ".value-btn"
+        )
+        .forEach(
+            item => {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    emptySelection.classList.remove(
+        "active"
+    );
+
+
+    selected = {
+        type,
+        value
+    };
+
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+
+    const labels = {
+
+        sub:
+            "Abone",
+
+        kicks:
+            "Kicks",
+
+        beets:
+            "Beets",
+
+        donate:
+            "Donate"
+
+    };
+
+
+    selectionSummary.textContent =
+        `${labels[type]}: ${formatSelectionValue(value)}`;
+
+
+    saveState();
+
+}
+
+
+function clearSelection() {
+
+    selected =
+        null;
+
+
+    document
+        .querySelectorAll(
+            ".value-btn"
+        )
+        .forEach(
+            item => {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    emptySelection.classList.add(
+        "active"
+    );
+
+
+    selectionSummary.textContent =
+        "Seçim yapılmadı.";
+
+
+    saveState();
+
+}
+
+
+function restoreSelectedButton() {
+
+    document
+        .querySelectorAll(
+            ".value-btn"
+        )
+        .forEach(
+            button => {
+
+                button.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    emptySelection.classList.remove(
+        "active"
+    );
+
+
+    if (!selected) {
+
+        emptySelection.classList.add(
+            "active"
+        );
+
+
+        selectionSummary.textContent =
+            "Seçim yapılmadı.";
+
+
+        return;
+
+    }
+
+
+    const labels = {
+
+        sub:
+            "Abone",
+
+        kicks:
+            "Kicks",
+
+        beets:
+            "Beets",
+
+        donate:
+            "Donate"
+
+    };
+
+
+    selectionSummary.textContent =
+        `${labels[selected.type]}: ${formatSelectionValue(selected.value)}`;
+
+
+    const exactButton =
+        Array.from(
+
+            document.querySelectorAll(
+
+                `.value-btn[data-type="${selected.type}"][data-value]`
+
+            )
+
+        )
+        .find(
+            button =>
+
+                Number(
+                    button.dataset.value
+                ) ===
+
+                Number(
+                    selected.value
+                )
+
+        );
+
+
+    if (exactButton) {
+
+        exactButton.classList.add(
+            "active"
+        );
+
+        return;
+
+    }
+
+
+    const customButton =
+        document.querySelector(
+
+            `.custom-btn[data-type="${selected.type}"]`
+
+        );
+
+
+    if (customButton) {
+
+        customButton.classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+/* VISIBILITY */
+
+function syncVisibility() {
+
+    const configs = [
+
+        {
+            checkbox:
+                "subEnabled",
+
+            group:
+                "subGroup",
+
+            type:
+                "sub"
+        },
+
+        {
+            checkbox:
+                "kicksEnabled",
+
+            group:
+                "kicksGroup",
+
+            type:
+                "kicks"
+        },
+
+        {
+            checkbox:
+                "beetsEnabled",
+
+            group:
+                "beetsGroup",
+
+            type:
+                "beets"
+        },
+
+        {
+            checkbox:
+                "donateEnabled",
+
+            group:
+                "donateGroup",
+
+            type:
+                "donate"
+        }
+
+    ];
+
+
+    configs.forEach(
+        config => {
+
+
+            const enabled =
+                document
+                    .getElementById(
+                        config.checkbox
+                    )
+                    .checked;
+
+
+            document
+                .getElementById(
+                    config.group
+                )
+                .classList
+                .toggle(
+                    "hidden",
+                    !enabled
+                );
+
+
+            if (
+                selected &&
+                selected.type ===
+                    config.type &&
+                !enabled
+            ) {
+
+                selected =
+                    null;
+
+            }
+
+        }
+    );
+
+
+    restoreSelectedButton();
+
+}
+
+
+/* BUTTONS */
+
+document
+    .querySelectorAll(
+        ".value-btn"
+    )
+    .forEach(
+        button => {
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+
+                    const type =
+                        button.dataset.type;
+
+
+                    if (
+                        button.classList.contains(
+                            "custom-btn"
+                        )
+                    ) {
+
+                        pendingCustomType =
+                            type;
+
+
+                        pendingCustomButton =
+                            button;
+
+
+                        customModalSubtitle.textContent =
+                            `${type} için custom değer gir.`;
+
+
+                        customValueInput.value =
+                            "";
+
+
+                        customModal.classList.add(
+                            "open"
+                        );
+
+
+                        setTimeout(
+                            () => {
+
+                                customValueInput.focus();
+
+                            },
+                            50
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    selectValue(
+
+                        type,
+
+                        Number(
+                            button.dataset.value
+                        ),
+
+                        button
+
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+emptySelection.addEventListener(
+    "click",
+    clearSelection
+);
+
+
+/* CUSTOM */
+
+function closeCustomModal() {
+
+    customModal.classList.remove(
+        "open"
+    );
+
+
+    pendingCustomType =
+        null;
+
+
+    pendingCustomButton =
+        null;
+
+}
+
+
+function confirmCustomValue() {
+
+    const value =
+        Number(
+            customValueInput.value
+        );
+
+
+    if (
+        !Number.isFinite(value) ||
+        value <= 0
+    ) {
+
+        return;
+
+    }
+
+
+    selectValue(
+
+        pendingCustomType,
+
+        value,
+
+        pendingCustomButton
+
+    );
+
+
+    closeCustomModal();
+
+}
+
+
+customConfirm.addEventListener(
+    "click",
+    confirmCustomValue
+);
+
+
+customCancel.addEventListener(
+    "click",
+    closeCustomModal
+);
+
+
+/* CONFIG */
+
+configToggle.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        configPanel.classList.toggle(
+            "open"
+        );
+
+    }
+);
+
+
+configClose.addEventListener(
+    "click",
+    () => {
+
+        configPanel.classList.remove(
+            "open"
+        );
+
+    }
+);
+
+
+/* AUTO SAVE */
+
+let entriesTimer = null;
+
+
+entriesInput.addEventListener(
+    "input",
+    () => {
+
+        if (!spinning) {
+            drawWheel();
+        }
+
+
+        clearTimeout(
+            entriesTimer
+        );
+
+
+        entriesTimer =
+            setTimeout(
+                saveState,
+                200
+            );
+
+    }
+);
+
+
+[
+    "subMinutes",
+    "kicksMinutes",
+    "donateMinutes",
+    "beetsMinutes"
+]
+.forEach(
+    id => {
+
+        document
+            .getElementById(id)
+            .addEventListener(
+                "input",
+                saveState
+            );
+
+    }
+);
+
+
+[
+    "subEnabled",
+    "kicksEnabled",
+    "donateEnabled",
+    "beetsEnabled"
+]
+.forEach(
+    id => {
+
+        document
+            .getElementById(id)
+            .addEventListener(
+                "change",
+                () => {
+
+                    syncVisibility();
+
+                    saveState();
+
+                }
+            );
+
+    }
+);
+
+
+/* WHEEL CLICK */
+
+canvas.addEventListener(
+    "click",
+    spin
+);
+
+
+/* PALETTE */
+
+function syncPaletteButtons() {
+
+    document
+        .querySelectorAll(
+            ".palette-btn"
+        )
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+
+                    "active",
+
+                    button.dataset.palette ===
+                    currentPalette
+
+                );
+
+            }
+        );
+
+}
+
+
+document
+    .querySelectorAll(
+        ".palette-btn"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    currentPalette =
+                        button.dataset.palette;
+
+
+                    syncPaletteButtons();
+
+                    drawWheel();
+
+                    saveState();
+
+                }
+            );
+
+        }
+    );
+
+
+/* IMAGE */
+
+function loadCenterImageFromData(data) {
+
+    if (!data) {
+
+        centerImage =
+            null;
+
+        drawWheel();
+
+        return;
+
+    }
+
+
+    const image =
+        new Image();
+
+
+    image.onload =
+        () => {
+
+            centerImage =
+                image;
+
+            drawWheel();
+
+        };
+
+
+    image.src =
+        data;
+
+}
+
+
+function resizeImageForStorage(file) {
+
+    return new Promise(
+        (
+            resolve,
+            reject
+        ) => {
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onerror =
+                reject;
+
+
+            reader.onload =
+                event => {
+
+
+                    const image =
+                        new Image();
+
+
+                    image.onerror =
+                        reject;
+
+
+                    image.onload =
+                        () => {
+
+
+                            const maxSize =
+                                650;
+
+
+                            const scale =
+                                Math.min(
+
+                                    1,
+
+                                    maxSize /
+                                    Math.max(
+                                        image.width,
+                                        image.height
+                                    )
+
+                                );
+
+
+                            const width =
+                                Math.round(
+                                    image.width *
+                                    scale
+                                );
+
+
+                            const height =
+                                Math.round(
+                                    image.height *
+                                    scale
+                                );
+
+
+                            const tempCanvas =
+                                document.createElement(
+                                    "canvas"
+                                );
+
+
+                            tempCanvas.width =
+                                width;
+
+                            tempCanvas.height =
+                                height;
+
+
+                            const tempCtx =
+                                tempCanvas.getContext(
+                                    "2d"
+                                );
+
+
+                            tempCtx.drawImage(
+                                image,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+
+
+                            resolve(
+
+                                tempCanvas.toDataURL(
+                                    "image/webp",
+                                    0.85
+                                )
+
+                            );
+
+                        };
+
+
+                    image.src =
+                        event.target.result;
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+centerImageInput.addEventListener(
+    "change",
+    async event => {
+
+
+        const file =
+            event.target.files[0];
+
+
+        if (!file) {
+            return;
+        }
+
+
+        centerImageData =
+            await resizeImageForStorage(
+                file
+            );
+
+
+        loadCenterImageFromData(
+            centerImageData
+        );
+
+
+        saveState();
+
+    }
+);
+
+
+removeImageBtn.addEventListener(
+    "click",
+    () => {
+
+        centerImage =
+            null;
+
+        centerImageData =
+            null;
+
+        centerImageInput.value =
+            "";
+
+        drawWheel();
+
+        saveState();
+
+    }
+);
+
+
+/* UNDO */
+
+undoLastResultButton.addEventListener(
+    "click",
+    () => {
+
+
+        if (!lastApplied) {
+
+            showToast(
+                "İptal edilecek sonuç yok."
+            );
+
+            return;
+
+        }
+
+
+        const cancelled =
+            lastApplied.result;
+
+
+        normalTotalMinutes =
+            Math.max(
+
+                0,
+
+                normalTotalMinutes -
+                lastApplied.normalAdded
+
+            );
+
+
+        multipliedTotalMinutes =
+            Math.max(
+
+                0,
+
+                multipliedTotalMinutes -
+                lastApplied.multipliedAdded
+
+            );
+
+
+        lastApplied =
+            null;
+
+
+        updateTimes();
+
+
+        setLastResult(
+
+            "İPTAL",
+
+            `${cancelled} sonucu geri alındı.`
+
+        );
+
+
+        updateUndoButton();
+
+        saveState();
+
+    }
+);
+
+
+/* RESET TIMES */
+
+resetTimesButton.addEventListener(
+    "click",
+    () => {
+
+        resetTimesModal.classList.add(
+            "open"
+        );
+
+    }
+);
+
+
+resetTimesCancel.addEventListener(
+    "click",
+    () => {
+
+        resetTimesModal.classList.remove(
+            "open"
+        );
+
+    }
+);
+
+
+resetTimesConfirm.addEventListener(
+    "click",
+    () => {
+
+        normalTotalMinutes =
+            0;
+
+        multipliedTotalMinutes =
+            0;
+
+        lastApplied =
+            null;
+
+
+        lastResultState = {
+
+            result:
+                "-",
+
+            description:
+                "Sayaçlar sıfırlandı."
+
+        };
+
+
+        updateTimes();
+
+        updateLastResult();
+
+        updateUndoButton();
+
+        saveState();
+
+
+        resetTimesModal.classList.remove(
+            "open"
+        );
+
+    }
+);
+
+
+/* RESET ALL */
+
+resetSettingsButton.addEventListener(
+    "click",
+    () => {
+
+        resetModal.classList.add(
+            "open"
+        );
+
+    }
+);
+
+
+resetCancel.addEventListener(
+    "click",
+    () => {
+
+        resetModal.classList.remove(
+            "open"
+        );
+
+    }
+);
+
+
+resetConfirm.addEventListener(
+    "click",
+    () => {
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        applyState(
+            cloneObject(
+                DEFAULT_STATE
+            )
+        );
+
+
+        saveState();
+
+
+        resetModal.classList.remove(
+            "open"
+        );
+
+    }
+);
+
+
+/* EXPORT */
+
+exportButton.addEventListener(
+    "click",
+    () => {
+
+
+        const blob =
+            new Blob(
+                [
+                    JSON.stringify(
+                        buildState(),
+                        null,
+                        2
+                    )
+                ],
+                {
+                    type:
+                        "application/json"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href =
+            url;
+
+
+        link.download =
+            "stream-wheel.json";
+
+
+        link.click();
+
+
+        URL.revokeObjectURL(
+            url
+        );
+
+    }
+);
+
+
+/* IMPORT */
+
+importButton.addEventListener(
+    "click",
+    () => {
+
+        importFileInput.value =
+            "";
+
+        importFileInput.click();
+
+    }
+);
+
+
+importFileInput.addEventListener(
+    "change",
+    event => {
+
+
+        const file =
+            event.target.files[0];
+
+
+        if (!file) {
+            return;
+        }
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            readEvent => {
+
+
+                try {
+
+                    const parsed =
+                        JSON.parse(
+                            readEvent.target.result
+                        );
+
+
+                    const normalized =
+                        normalizeImportedState(
+                            parsed
+                        );
+
+
+                    applyState(
+                        normalized
+                    );
+
+
+                    saveState();
+
+
+                    showToast(
+                        "Import tamamlandı."
+                    );
+
+
+                } catch {
+
+                    showToast(
+                        "Geçersiz JSON."
+                    );
+
+                }
+
+            };
+
+
+        reader.readAsText(
+            file
+        );
+
+    }
+);
+
+
+/* START */
+
+const storedState =
+    loadStoredState();
+
+
+applyState(
+    storedState
+);
+
+
+saveState();
+
+</script>
+
+</body>
+</html>
